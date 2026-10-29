@@ -55,6 +55,57 @@ Uninstall:
 pwsh -File "$env:USERPROFILE\mx-smooth-freespin\install.ps1" -Uninstall
 ```
 
+### Let an AI assistant do it
+
+If you use an AI assistant that can run commands on your PC (Claude Code, Codex,
+Cursor, GitHub Copilot in agent mode, or similar), paste this prompt into it.
+A chat-only assistant can't run anything; with one of those, follow the steps
+above yourself.
+
+```text
+Install the open-source tool https://github.com/SolusKossi/mx-smooth-freespin on
+this Windows PC for me. It makes the free-spin mode of a Logitech MX Master
+mouse scroll smoothly while ratchet mode stays line by line. Do the work
+yourself; only ask me when you need me to touch the mouse or make a choice.
+
+1. Check prerequisites: Windows 10/11, Python 3 (`python --version`, and that
+   `pythonw.exe` is on PATH), and git. If Python is missing, tell me to install
+   it from python.org (with "Add to PATH" ticked) and stop. If git is missing,
+   download the repo as a ZIP from GitHub instead, extract it to
+   %USERPROFILE%\mx-smooth-freespin and run Unblock-File on the extracted files.
+2. Clone it: git clone https://github.com/SolusKossi/mx-smooth-freespin.git
+   "%USERPROFILE%\mx-smooth-freespin"
+3. Read mx_scroll_mode.py and install.ps1 before running them, and tell me in
+   two sentences what they do. They should use only Python's standard library
+   and Windows' own DLLs, make no network calls, and need no admin rights.
+   If you see anything else, stop and tell me.
+4. Run: python "%USERPROFILE%\mx-smooth-freespin\mx_scroll_mode.py" probe
+   - A line like "receiver C548 dev 0x03: 0x2121 at index ..." means it works
+     with my mouse. Note whether "diverted to software" is yes or no.
+   - "No HID++ device with HiResWheel (0x2121) found" means the mouse isn't
+     reachable. Tell me to wake it by moving it and run probe again. If it is
+     still not found, the mouse is probably on Bluetooth. This tool is only
+     tested with a Logi Bolt receiver (a Unifying receiver may work); tell me
+     that and stop.
+5. Ask me to confirm Logi Options+ is running and that "Smooth scrolling" is on
+   (Options+ > the mouse > Point & Scroll > Scroll wheel).
+6. Install: pwsh -File "%USERPROFILE%\mx-smooth-freespin\install.ps1"
+   (use `powershell -ExecutionPolicy Bypass -File ...` if pwsh is not installed).
+   This copies the script to %LOCALAPPDATA%\MXSmoothScroll, adds a shortcut to
+   my Startup folder and starts it in the background.
+7. Wait a few seconds, then show me %LOCALAPPDATA%\MXSmoothScroll\mx_scroll_mode.log.
+   It should say "using receiver ..." and then "ratchet" or "free-spin".
+8. Ask me to press the button below the wheel to switch to free-spin and
+   scroll a long web page, then switch back. Free-spin should glide; ratchet
+   should step. Check the log shows the switches.
+9. If it feels too slow or fast, edit the Startup shortcut "MX Smooth Scroll"
+   to add --speed=1.5 (or another value) after "run", stop the running
+   pythonw.exe that has mx_scroll_mode.py on its command line (by its PID only,
+   never all python processes) and start it again from the shortcut.
+
+To uninstall later: pwsh -File "%USERPROFILE%\mx-smooth-freespin\install.ps1" -Uninstall
+```
+
 ## Use and tuning
 
 ```powershell
